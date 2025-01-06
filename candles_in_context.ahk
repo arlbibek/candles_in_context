@@ -1,36 +1,52 @@
 #SingleInstance
 
-SS_URL := "https://pro.sharesansar.com/technical/advanced-chart"
-STOCKS_SYMBOLS := ["ADBL", "w.MKCL", "d.MKCL", "w.KBL", "d.KBL", "d.PRVU", "w.PRVU", "w.LSL", "d.LSL"]
+wait_page_load := 5000
 
-TrayTip("Press {F2} starts search, make sure that you are logged into SS Pro. `n`nMade with ❤️ by Bibek Aryal. ", "Candles in context started (Total: " . (STOCKS_SYMBOLS.Length) . ")", "Iconi Mute")
+getScripts(filename) {
+    FileRead := []  ; Initialize empty array
 
-wait_pageload := 5000
+    try {
+        Loop read filename {
+            if (Trim(A_LoopReadLine) != "")  ; Skip empty or whitespace-only lines
+                FileRead.Push(A_LoopReadLine)
+        }
+        return FileRead
+    }
+    catch as err {
+        MsgBox("Error reading file: " err.Message)
+    }
+}
 
-caldles_in_context(stock_symbol) {
+candles_in_context(stock_symbol) {
     Send(".")
-    Sleep(1000)
+    Sleep(3000)
     Send(stock_symbol)
-    Sleep(300)
+    Sleep(1000)
     Send("{DOWN}{ENTER}")
-    Sleep(200)
+    Sleep(300)
     Send("{Esc}")
     Sleep(3000)
     Send("!r")
     Sleep(5000)
 }
 
-
 main() {
-    TrayTip("Opening " . SS_URL . "`nSearch starts after " . (wait_pageload / 1000) . " sec", "Candles in context - Search started", "Iconi 0x10")
+    TrayTip("Opening " . SS_URL . "`nSearch starts after " . (wait_page_load / 1000) . " sec", "Candles in context - Search started", "Iconi 0x10")
     Run(SS_URL)
-    Sleep(wait_pageload)
-    Send("{TAB}")
-    for stock_symobl in STOCKS_SYMBOLS {
-        caldles_in_context(stock_symobl)
+    Sleep(wait_page_load)
+    MouseMove(A_ScreenWidth // 2, A_ScreenHeight // 2)
+    Sleep(100)
+    MouseClick("Left")
+    Sleep(100)
+    for stock_symbol in STOCKS_SYMBOLS {
+        candles_in_context(stock_symbol)
     }
-    MsgBox("Review completed sucessfully!!`n`nMade with ❤️ by Bibek Aryal. ", "Candles in context  - completed!")
+    MsgBox("Review completed successfully! `n`nMade with ❤️ by Bibek Aryal. ", "Candles in context  - completed! ")
 }
 
+SS_URL := "https://pro.sharesansar.com/technical/advanced-chart"
+STOCKS_SYMBOLS := getScripts("scripts.txt")
+TrayTip("Press {F2} starts search, make sure that you are logged into SS Pro. `n`nMade with ❤️ by Bibek Aryal. ", "Candles in context started (Total: " . (STOCKS_SYMBOLS.Length) . ")", "Iconi Mute")
 
-f2:: main()
+
+2:: main()
